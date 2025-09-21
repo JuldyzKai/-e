@@ -1,1 +1,813 @@
-# -e
+
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Зат Есімдер Тест Ойыны</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('дала.jpg');
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.079);
+            border-radius: 20px;
+            padding: 30px;
+            width: 80%;
+            max-width: 2000px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #2575fc;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-left: 5px solid #2575fc;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            font-size: 24px;
+            color: #2575fc;
+        }
+
+        .oylar-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .oyu {
+            height: 150px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .oyu img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .oyu:hover img {
+            transform: scale(1.05);
+        }
+
+        .oyu:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .oyu.completed {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .question-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .question-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .question-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transform: translateY(50px);
+            transition: transform 0.3s ease;
+        }
+
+        .question-modal.active .question-container {
+            transform: translateY(0);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #2575fc;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            border: 2px solid #e9ecef;
+            font-size: 1.1rem;
+        }
+
+        .option:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .option.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .option.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .score-container {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2575fc;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .correct-result {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .incorrect-result {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .points-animation {
+            position: absolute;
+            font-size: 3rem;
+            color: #4caf50;
+            font-weight: bold;
+            animation: floatUp 1s ease-out;
+            opacity: 0;
+            z-index: 1001;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            height: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .completed-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2ecc71;
+            margin: 20px 0;
+            display: none;
+            text-align: center;
+            padding: 15px;
+            background-color: #d4edda;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .oylar-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .oylar-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .oyu {
+            height: 250px;
+            width: 250px; /* Дөңгелек пішін үшін бірдей биіктік пен ені */
+            border-radius: 50%; /* Дөңгелек пішін үшін 50% */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to right, #bfa86f, #f1ece6);
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto; /* Ортаға туралау */
+        }
+
+        .oyu img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.3s ease;
+            border-radius: 50%; /* Суретті де дөңгелек ету */
+            }
+            
+            
+            .question-container {
+                padding: 20px;
+            }
+        
+    </style>
+</head>
+<body>
+    <div >
+        <h1> </h1>
+        
+        <div >
+            
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div> </div>
+                <div class="stat-value" id="remainingQuestions">30</div>
+            </div>
+            <div class="stat-item">
+                <div> </div>
+                <div class="stat-value" id="correctAnswers">0</div>
+            </div>
+            <div class="stat-item">
+                <div> </div>
+                <div class="stat-value" id="incorrectAnswers">0</div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="oylar-container" id="oylarContainer">
+            <div class="oyu">
+                <img src="1.jpg" >
+            </div>
+            <div class="oyu">
+                <img src="3.jpg">
+            </div>
+            <div class="oyu">
+                <img src="2.jpg" >
+            </div>
+            <div class="oyu">
+                <img src="4.jpg" >
+            </div>
+            <div class="oyu">
+                <img src="9.jpg" >
+            </div>
+            <div class="oyu">
+                <img src="5.jpg" >
+            </div>
+            <div class="oyu">
+                <img src="7.jpg" >
+            </div>
+            <div class="oyu">
+                <img src="8.jpg" >
+            </div>
+        </div>
+        
+        <div class="score-container">
+            Жалпы ұпай: <span id="score">0</span>
+        </div>
+        
+        <div class="controls">
+            <button id="restartBtn">Қайта бастау</button>
+        </div>
+        
+        <div class="completed-message" id="completedMessage">
+            Барлық сұрақтарға жауап бердіңіз! 🎉
+        </div>
+    </div>
+
+    <div class="question-modal" id="questionModal">
+        <div class="question-container">
+            <div class="close-btn" id="closeQuestion">×</div>
+            <div class="question-text" id="questionText"></div>
+            <div class="timer" id="timer">20 секунд қалды</div>
+            <div class="options" id="optionsContainer"></div>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Тест сұрақтары
+            const questions = [
+                {
+                    question: "1. Еңсең ... , Ішерсің ... .",
+                    options: [
+                        
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "2. Жаңбыр жауса — ... тоқ, Егін ексе — ... тоқ.",
+                    options: [
+                       
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "3. Бұлақ ақса — ... тоқ. Еңбек етсе — ... тоқ.",
+                    options: [
+                        
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "4. Қолы қимылдағанның ... қимылдар.",
+                    options: [
+                        
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "5. Жас кезімде ... бер Қартайғанда ... бер.",
+                    options: [
+                        
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "6. Еңбек ет те, ... ет.",
+                    options: [
+                        
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "7. Еңбек ет те ... , Ойнап-күл де ... .",
+                    options: [
+                        
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "8. Еңбегіне қарай — ... . Жасына қарай — ... .",
+                    options: [
+                        
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "9. Өзен жағалағанның ... талмас.",
+                    options: [
+                        
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "10. Күшің барда, ... ! Тісің барда, ... !",
+                    options: [
+                       
+                    ],
+                    correct: 3
+                },
+                {
+                    question: "11. Еңбегі аздың ... аз.",
+                    options: [
+                        
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "12. Еңбексіз тапқан мал ... кетер.",
+                    options: [
+                       
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "13. Еңбектің ... тәтті. Жалқаудың ... тәтті.",
+                    options: [
+                      
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "14. Еңбек етсең ... , тояды қарның ... .",
+                    options: [
+                        
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "15. Еріншек бармаймын деген жеріне ... барады.",
+                    options: [
+                        
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "16. Еріншектің ... бітпес.",
+                    options: [
+                        
+                    ],
+                    correct: 2
+                }
+            ];
+
+            // DOM элементтері
+            const oylarContainer = document.getElementById('oylarContainer');
+            const questionModal = document.getElementById('questionModal');
+            const questionText = document.getElementById('questionText');
+            const timerElement = document.getElementById('timer');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const resultElement = document.getElementById('result');
+            const scoreElement = document.getElementById('score');
+            const remainingQuestions = document.getElementById('remainingQuestions');
+            const correctAnswers = document.getElementById('correctAnswers');
+            const incorrectAnswers = document.getElementById('incorrectAnswers');
+            const progressBar = document.getElementById('progressBar');
+            const restartBtn = document.getElementById('restartBtn');
+            const closeQuestionBtn = document.getElementById('closeQuestion');
+            const completedMessage = document.getElementById('completedMessage');
+
+            // Айнымалылар
+            let usedQuestions = [];
+            let currentQuestion = null;
+            let timeLeft = 20;
+            let timerInterval = null;
+            let cellsCompleted = 0;
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let totalScore = 0;
+
+            // Ойынды бастау
+            function initGame() {
+                // Оюларға іс-әрекеттерді қосу
+                const oyuElements = document.querySelectorAll('.oyu');
+                oyuElements.forEach((oyu, index) => {
+                    oyu.addEventListener('click', () => openCell(index));
+                });
+                
+                updateStats();
+            }
+
+            // Ұяшықты ашу
+            function openCell(index) {
+                const oyu = document.querySelectorAll('.oyu')[index];
+                
+                // Барлық сұрақтар қoyылған ба?
+                if (usedQuestions.length >= questions.length) {
+                    completedMessage.style.display = 'block';
+                    return;
+                }
+                
+                // Кезексіз сұрақты таңдау
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * questions.length);
+                } while (usedQuestions.includes(randomIndex));
+                
+                usedQuestions.push(randomIndex);
+                currentQuestion = questions[randomIndex];
+                
+                // Сұрақты көрсету
+                showQuestion(currentQuestion);
+                
+                // Оюды ашылған деп белгілеу
+                oyu.classList.add('completed');
+                cellsCompleted++;
+            }
+
+            // Сұрақты көрсету
+            function showQuestion(question) {
+                questionModal.classList.add('active');
+                questionText.textContent = question.question;
+                
+                // Нұсқаларды тазалау
+                optionsContainer.innerHTML = '';
+                
+                // Нұсқаларды қосу
+                question.options.forEach((option, index) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    optionElement.textContent = option;
+                    optionElement.addEventListener('click', () => checkAnswer(index));
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // Нәтиже жасырын
+                resultElement.style.display = 'none';
+                
+                // Таймерді бастау
+                startTimer();
+            }
+
+            // Жауапты тексеру
+            function checkAnswer(selectedIndex) {
+                // Таймерді тоқтату
+                clearInterval(timerInterval);
+                
+                const options = document.querySelectorAll('.option');
+                const correctIndex = currentQuestion.correct;
+                
+                // Барлық нұсқаларды өшіріп қою
+                options.forEach(option => {
+                    option.style.pointerEvents = 'none';
+                });
+                
+                // Дұрыс жауапты жасыл ету
+                options[correctIndex].classList.add('correct');
+                
+                if (selectedIndex === correctIndex) {
+                    // Дұрыс жауап
+                    correctCount++;
+                    totalScore++;
+                    resultElement.textContent = 'Дұрыс! +1 ұпай';
+                    resultElement.className = 'result correct-result';
+                    
+                    // +1 анимациясын көрсету
+                    showPointsAnimation();
+                } else {
+                    // Қате жауап
+                    options[selectedIndex].classList.add('incorrect');
+                    incorrectCount++;
+                    resultElement.textContent = `Қате! Дұрыс жауап: ${currentQuestion.options[correctIndex]}`;
+                    resultElement.className = 'result incorrect-result';
+                }
+                
+                resultElement.style.display = 'block';
+                
+                // Статистиканы жаңарту
+                updateStats();
+                
+                // 2 секунд күту де сұрақты жабу
+                setTimeout(() => {
+                    questionModal.classList.remove('active');
+                    
+                    // Егер барлық сұрақтар қoyылса, хабарлау
+                    if (usedQuestions.length >= questions.length) {
+                        completedMessage.style.display = 'block';
+                    }
+                }, 2000);
+            }
+
+            // +1 анимациясын көрсету
+            function showPointsAnimation() {
+                const points = document.createElement('div');
+                points.className = 'points-animation';
+                points.textContent = '+1';
+                points.style.position = 'fixed';
+                points.style.left = '50%';
+                points.style.top = '50%';
+                points.style.transform = 'translate(-50%, -50%)';
+                document.body.appendChild(points);
+                
+                setTimeout(() => {
+                    document.body.removeChild(points);
+                }, 1000);
+            }
+
+            // Таймерді бастау
+            function startTimer() {
+                timeLeft = 30;
+                timerElement.textContent = `${timeLeft} секунд қалды`;
+                
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerElement.textContent = `${timeLeft} секунд қалды`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        const options = document.querySelectorAll('.option');
+                        const correctIndex = currentQuestion.correct;
+                        
+                        // Барлық нұсқаларды өшіріп қою
+                        options.forEach(option => {
+                            option.style.pointerEvents = 'none';
+                        });
+                        
+                        // Дұрыс жауапты көрсету
+                        options[correctIndex].classList.add('correct');
+                        
+                        incorrectCount++;
+                        resultElement.textContent = `Уақыт бітті! Дұрыс жауап: ${currentQuestion.options[correctIndex]}`;
+                        resultElement.className = 'result incorrect-result';
+                        resultElement.style.display = 'block';
+                        
+                        // Статистиканы жаңарту
+                        updateStats();
+                        
+                        // 2 секунд күту де сұрақты жабу
+                        setTimeout(() => {
+                            questionModal.classList.remove('active');
+                            
+                            // Егер барлық сұрақтар қoyылса, хабарлау
+                            if (usedQuestions.length >= questions.length) {
+                                completedMessage.style.display = 'block';
+                            }
+                        }, 2000);
+                    }
+                }, 1000);
+            }
+
+            // Статистиканы жаңарту
+            function updateStats() {
+                remainingQuestions.textContent = questions.length - usedQuestions.length;
+                correctAnswers.textContent = correctCount;
+                incorrectAnswers.textContent = incorrectCount;
+                scoreElement.textContent = totalScore;
+                
+                // Прогресс барды жаңарту
+                const progress = (usedQuestions.length / questions.length) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+
+            // Сұрақты жабу
+            closeQuestionBtn.addEventListener('click', function() {
+                clearInterval(timerInterval);
+                questionModal.classList.remove('active');
+            });
+
+            // Қайта бастау түймесі
+            restartBtn.addEventListener('click', function() {
+                resetGame();
+            });
+
+            // Ойынды қалпына келтіру
+            function resetGame() {
+                usedQuestions = [];
+                currentQuestion = null;
+                cellsCompleted = 0;
+                correctCount = 0;
+                incorrectCount = 0;
+                totalScore = 0;
+                
+                clearInterval(timerInterval);
+                
+                // Оюларды тазалау
+                const oyuElements = document.querySelectorAll('.oyu');
+                oyuElements.forEach(oyu => {
+                    oyu.classList.remove('completed');
+                });
+                
+                // Хабарламаларды жасыру
+                completedMessage.style.display = 'none';
+                questionModal.classList.remove('active');
+                
+                // Статистиканы жаңарту
+                updateStats();
+            }
+
+            // Ойынды іске қосу
+            initGame();
+        });
+    </script>
+</body>
+</html>
