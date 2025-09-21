@@ -28,7 +28,7 @@
             border-radius: 20px;
             padding: 30px;
             width: 80%;
-            max-width: 1600px;
+            max-width: 2000px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
